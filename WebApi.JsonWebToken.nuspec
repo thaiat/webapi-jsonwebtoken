@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <metadata>
         <id>WebApi.JsonWebToken</id>
-        <version>0.0.5</version>
+        <version>0.0.6</version>
         <title>JsonWebToken DelegatingHandler for WebAPI</title>
         <authors>Matias Woloski</authors>
         <owners>auth0</owners>
@@ -14,7 +14,7 @@
         <summary>JsonWebToken DelegatingHandler for ASP.NET Web API</summary>
         <tags>jwt, webapi, Auth0, OAuth</tags>
         <dependencies>
-            <dependency id="Microsoft.IdentityModel.Tokens.JWT" version="0.1.0" />
+            <dependency id="System.IdentityModel.Tokens.Jwt" version="1.0.0" />
         </dependencies>
         <frameworkAssemblies>
             <frameworkAssembly assemblyName="System.IdentityModel" targetFramework="" />

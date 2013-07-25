@@ -1,10 +1,9 @@
 ﻿namespace $rootnamespace$.App_Start
 {
-    using Microsoft.IdentityModel.Tokens.JWT;
     using System;
     using System.Collections.Generic;
     using System.IdentityModel.Tokens;
-    using System.Linq;
+	using System.Linq;
     using System.Net;
     using System.Net.Http;
     using System.ServiceModel.Security.Tokens;
@@ -50,7 +49,7 @@
             {
                 try
                 {
-                    var tokenHandler = new JWTSecurityTokenHandler();
+                    var tokenHandler = new JwtSecurityTokenHandler();
                     var secret = this.SymmetricKey.Replace('-', '+').Replace('_', '/');
                     var validationParameters = new TokenValidationParameters()
                     {
