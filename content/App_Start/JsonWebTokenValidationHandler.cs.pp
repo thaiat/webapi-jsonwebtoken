@@ -40,12 +40,9 @@
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             string token;
+            HttpResponseMessage errorResponse = null;
 
-            if (!TryRetrieveToken(request, out token))
-            {
-                request.CreateErrorResponse(HttpStatusCode.Unauthorized, string.Empty);
-            }
-            else
+            if (TryRetrieveToken(request, out token))
             {
                 try
                 {
@@ -64,15 +61,17 @@
                 }
                 catch (SecurityTokenValidationException ex)
                 {
-                    request.CreateErrorResponse(HttpStatusCode.Unauthorized, ex);
+                    errorResponse = request.CreateErrorResponse(HttpStatusCode.Unauthorized, ex);
                 }
                 catch (Exception ex)
                 {
-                    request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex);
+                    errorResponse = request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex);
                 }
             }
 
-            return base.SendAsync(request, cancellationToken);
+            return errorResponse != null ?
+                Task.FromResult(errorResponse) :
+                base.SendAsync(request, cancellationToken);
         }
     }
 }
