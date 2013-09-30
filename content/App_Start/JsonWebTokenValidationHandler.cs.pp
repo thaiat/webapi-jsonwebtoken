@@ -2,11 +2,9 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.IdentityModel.Tokens;
-	using System.Linq;
+    using System.Linq;
     using System.Net;
     using System.Net.Http;
-    using System.ServiceModel.Security.Tokens;
     using System.Threading;
     using System.Threading.Tasks;
     
@@ -46,20 +44,20 @@
             {
                 try
                 {
-                    var tokenHandler = new JwtSecurityTokenHandler();
                     var secret = this.SymmetricKey.Replace('-', '+').Replace('_', '/');
-                    var validationParameters = new TokenValidationParameters()
-                    {
-                        AllowedAudience = this.Audience,
-                        ValidateIssuer = this.Issuer != null ? true : false,
-                        ValidIssuer = this.Issuer,
-                        SigningToken = new BinarySecretSecurityToken(Convert.FromBase64String(secret))
-                    };
 
-                    Thread.CurrentPrincipal =
-                        tokenHandler.ValidateToken(token, validationParameters);
+                    Thread.CurrentPrincipal = JsonWebToken.ValidateToken(
+                        token,
+                        secret,
+                        audience: this.Audience,
+                        checkExpiration: true,
+                        issuer: this.Issuer);
                 }
-                catch (SecurityTokenValidationException ex)
+                catch (JWT.SignatureVerificationException ex)
+                {
+                    errorResponse = request.CreateErrorResponse(HttpStatusCode.Unauthorized, ex);
+                }
+                catch (JsonWebToken.TokenValidationException ex)
                 {
                     errorResponse = request.CreateErrorResponse(HttpStatusCode.Unauthorized, ex);
                 }
