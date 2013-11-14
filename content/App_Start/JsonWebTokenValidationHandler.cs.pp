@@ -52,6 +52,11 @@
                         audience: this.Audience,
                         checkExpiration: true,
                         issuer: this.Issuer);
+                    
+                    if (HttpContext.Current != null)
+                    {
+                        HttpContext.Current.User = Thread.CurrentPrincipal;
+                    }
                 }
                 catch (JWT.SignatureVerificationException ex)
                 {
