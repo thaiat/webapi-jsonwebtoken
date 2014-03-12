@@ -21,6 +21,7 @@
 
         private static JavaScriptSerializer jsonSerializer = new JavaScriptSerializer();
 
+       
         public static ClaimsPrincipal ValidateToken(string token, string secretKey, string audience = null, bool checkExpiration = false, string issuer = null)
         {
             var payloadJson = JWT.JsonWebToken.Decode(token, Convert.FromBase64String(secretKey), verify: true);
@@ -69,23 +70,43 @@
             return new ClaimsPrincipal(ClaimsIdentityFromJwt(payloadData, issuer));
         }
 
+        private static bool AddClaimsFromDictionary(string issuer, object value, List<Claim> list, string claimType) 
+        {
+            var dictionary = value as IDictionary<string, object>;
+            if (dictionary != null) 
+            {
+                list.Add(new Claim(claimType, JsonConvert.SerializeObject(value), StringClaimValueType, issuer, issuer));
+                return true;
+            }
+            return false;
+        }
+
         private static List<Claim> ClaimsFromJwt(IDictionary<string, object> jwtData, string issuer)
         {
             var list = new List<Claim>();
             issuer = issuer ?? DefaultIssuer;
 
-            foreach (KeyValuePair<string, object> pair in jwtData)
+            foreach (KeyValuePair<string, object> pair in jwtData) 
             {
                 var claimType = pair.Key;
-                var source = pair.Value as ArrayList;
+                var arrayList = pair.Value as ArrayList;
 
-                if (source != null)
+                if (arrayList != null) 
                 {
-                    foreach (var item in source)
+                    foreach (var item in arrayList) 
                     {
+                        if (AddClaimsFromDictionary(issuer, item, list, claimType)) 
+                        {
+                            continue;
+                        }
                         list.Add(new Claim(claimType, item.ToString(), StringClaimValueType, issuer, issuer));
                     }
 
+                    continue;
+                }
+
+                if (AddClaimsFromDictionary(issuer, pair.Value, list, claimType)) 
+                {
                     continue;
                 }
 
